@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>เครื่องมือนักลงทุน</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:         #0d0b08;
+      --surface:    #171410;
+      --surface-hi: #1f1c16;
+      --border:     #3a352a;
+      --border-hi:  #524a38;
+      --text:       #ffffff;
+      --text-2:     #c8b89a;
+      --text-3:     #8a7e6c;
+      --accent:     #d4a04a;
+      --accent-dim: rgba(212,160,74,0.14);
+      --green:      #6ac87e;
+      --green-dim:  rgba(106,200,126,0.13);
+      --red:        #e06868;
+      --red-dim:    rgba(224,104,104,0.13);
+      --yellow:     #d4933a;
+      --yellow-dim: rgba(212,147,58,0.13);
+    }
+
+    body {
+      font-family: 'Sarabun', ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      font-size: 15px;
+      line-height: 1.65;
+    }
+
+    /* ── Header ── */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .hdr-left { display: flex; align-items: center; gap: 0.6rem; }
+
+    .hdr-mark {
+      color: var(--accent);
+      font-size: 18px;
+      line-height: 1;
+      margin-top: -1px;
+    }
+
+    .hdr-title {
+      font-size: 15px; font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+    .hdr-title span { color: var(--accent); }
+    .hdr-sub   { font-size: 11px; color: var(--text-3); }
+    .hdr-date  { font-size: 12px; color: var(--text-3); letter-spacing: 0.02em; }
+
+    /* ── Tabs ── */
+    .tabs {
+      background: var(--surface);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      padding: 0.65rem 2rem;
+      display: flex;
+      align-items: center;
+    }
+
+    .tab-group {
+      display: inline-flex;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 8px;
+      padding: 4px;
+      gap: 3px;
+    }
+
+    .tab {
+      padding: 0.48rem 1.3rem;
+      background: none;
+      border: none;
+      border-radius: 6px;
+      color: rgba(255,255,255,0.55);
+      font-size: 13px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .tab:hover  { color: rgba(255,255,255,0.85); background: rgba(255,255,255,0.07); }
+    .tab.active { background: var(--accent); color: #0d0b08; }
+
+    /* ── Main ── */
+    main { padding: 2rem; max-width: 1100px; margin: 0 auto; }
+
+    .section { display: none; }
+    .section.active { display: block; }
+
+    /* ── Section Title ── */
+    .sec-title {
+      font-size: 19px; font-weight: 700;
+      letter-spacing: -0.01em;
+      margin-bottom: 0.25rem;
+    }
+    .sec-sub {
+      font-size: 13px; color: var(--text-2);
+      margin-bottom: 1.75rem;
+    }
+
+    /* ── Panel ── */
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1.5rem 1.75rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .panel-title {
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--text-2); margin-bottom: 1.25rem;
+    }
+
+    /* ── Form ── */
+    .form-grid { display: grid; gap: 1.25rem; }
+    .form-grid-2 { grid-template-columns: 1fr 1fr; }
+    .form-grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+    .form-grid-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+
+    .field label {
+      display: block;
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.09em; text-transform: uppercase;
+      color: var(--text-2); margin-bottom: 0.45rem;
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      background: transparent;
+      border: none;
+      border-bottom: 1.5px solid var(--border);
+      border-radius: 0;
+      color: var(--text);
+      padding: 0.4rem 0;
+      font-size: 15px; font-family: inherit;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .field input:focus,
+    .field select:focus { border-bottom-color: var(--accent); }
+    .field input::placeholder { color: var(--text-3); }
+    .field select { background: var(--surface); border-radius: 0; cursor: pointer; }
+    .field select option { background: var(--surface); }
+
+    .field input[type=number]::-webkit-inner-spin-button,
+    .field input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; appearance: none; }
+    .field input[type=number] { -moz-appearance: textfield; appearance: textfield; }
+
+    /* ── Buttons ── */
+    .btn {
+      padding: 0.6rem 1.75rem;
+      border: none; border-radius: 5px;
+      font-size: 14px; font-weight: 700; font-family: inherit;
+      cursor: pointer; transition: filter 0.12s, transform 0.1s;
+      letter-spacing: 0.01em;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn-primary { background: var(--accent); color: #0d0b08; }
+    .btn-primary:hover { filter: brightness(1.1); }
+    .btn-green  { background: var(--green); color: #0d0b08; }
+    .btn-green:hover { filter: brightness(1.08); }
+
+    /* ── Quiz ── */
+    .q-card {
+      border-top: 1px solid var(--border);
+      padding: 1.5rem 0;
+    }
+    .q-card:last-of-type { border-bottom: 1px solid var(--border); }
+
+    .q-header {
+      display: flex; align-items: flex-start; gap: 1.1rem;
+      margin-bottom: 1rem;
+    }
+
+    .q-num {
+      font-size: 11px; font-weight: 800;
+      letter-spacing: 0.05em;
+      color: var(--accent);
+      flex-shrink: 0;
+      padding-top: 3px;
+      min-width: 28px;
+    }
+
+    .q-text { font-size: 15px; font-weight: 600; line-height: 1.55; }
+
+    .options { display: flex; flex-direction: column; gap: 0.4rem; padding-left: 2.5rem; }
+
+    .opt {
+      display: flex; align-items: center; gap: 0.65rem;
+      padding: 0.5rem 0.85rem;
+      border: 1px solid transparent;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.12s, border-color 0.12s;
+      font-size: 14px;
+    }
+    .opt:hover { background: var(--surface-hi); }
+    .opt input[type=radio] { accent-color: var(--accent); width: 14px; height: 14px; flex-shrink: 0; }
+    .opt.selected { background: var(--accent-dim); border-color: var(--border-hi); }
+
+    /* Quiz Result */
+    .risk-result {
+      border-radius: 6px;
+      padding: 1.75rem;
+      margin-top: 1.5rem;
+      display: none;
+      animation: fadeUp 0.35s ease;
+    }
+
+    .risk-badge {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.3rem 0.9rem;
+      border-radius: 3px;
+      font-size: 11px; font-weight: 800;
+      letter-spacing: 0.07em; text-transform: uppercase;
+      margin-bottom: 0.9rem;
+    }
+
+    .risk-name { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 0.5rem; }
+    .risk-desc { font-size: 14px; color: var(--text-2); line-height: 1.75; margin-bottom: 1.5rem; }
+
+    .score-bar-wrap { margin-bottom: 1.5rem; }
+    .score-bar-label {
+      display: flex; justify-content: space-between;
+      font-size: 11px; color: var(--text-3); margin-bottom: 0.45rem;
+    }
+    .score-bar-track {
+      height: 5px; background: var(--border);
+      border-radius: 999px; overflow: hidden;
+    }
+    .score-bar-fill { height: 100%; border-radius: 999px; transition: width 0.65s ease; }
+
+    .alloc-title { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.09em; color: var(--text-2); margin-bottom: 0.85rem; }
+
+    .alloc-row {
+      display: flex; align-items: center; gap: 0.75rem;
+      margin-bottom: 0.5rem; font-size: 13px;
+    }
+    .alloc-name { width: 130px; flex-shrink: 0; color: var(--text-2); }
+    .alloc-track { flex: 1; height: 4px; background: var(--border); border-radius: 999px; overflow: hidden; }
+    .alloc-fill  { height: 100%; border-radius: 999px; }
+    .alloc-pct   { width: 36px; text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+    /* ── Stock Analyzer ── */
+    .market-toggle { display: flex; gap: 0; margin-bottom: 1.5rem; }
+    .market-btn {
+      padding: 0.4rem 1.1rem;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-2);
+      font-size: 12px; font-weight: 700; font-family: inherit;
+      cursor: pointer; transition: all 0.12s;
+    }
+    .market-btn:first-child { border-radius: 4px 0 0 4px; }
+    .market-btn:last-child  { border-radius: 0 4px 4px 0; border-left: none; }
+    .market-btn.active { background: var(--accent); border-color: var(--accent); color: #0d0b08; }
+
+    .metric-cards {
+      display: grid; grid-template-columns: repeat(3,1fr);
+      gap: 1rem; margin-bottom: 1rem;
+    }
+
+    .metric-card {
+      background: var(--surface-hi);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 1.1rem 1.2rem;
+    }
+
+    .metric-lbl {
+      font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.09em;
+      color: var(--text-2); margin-bottom: 0.4rem;
+    }
+    .metric-val { font-size: 1.9rem; font-weight: 800; line-height: 1; margin-bottom: 0.35rem; letter-spacing: -0.02em; }
+    .metric-tag {
+      display: inline-block;
+      padding: 1px 7px; border-radius: 3px;
+      font-size: 10px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase;
+    }
+    .metric-bench { font-size: 11px; color: var(--text-3); margin-top: 0.35rem; }
+
+    .overall-card {
+      border-radius: 5px; padding: 1.2rem 1.4rem;
+      display: flex; align-items: center; gap: 1rem;
+    }
+    .overall-icon { font-size: 1.8rem; }
+    .overall-label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.09em; color: var(--text-2); margin-bottom: 3px; }
+    .overall-text { font-size: 1.2rem; font-weight: 800; }
+    .overall-detail { font-size: 13px; color: var(--text-2); margin-top: 3px; line-height: 1.55; }
+
+    .disclaimer {
+      font-size: 11px; color: var(--text-3);
+      border-top: 1px solid var(--border);
+      padding-top: 0.75rem; margin-top: 0.75rem;
+    }
+
+    /* ── DCA Calculator ── */
+    .dca-layout {
+      display: grid; grid-template-columns: 370px 1fr;
+      gap: 1.25rem; align-items: start;
+    }
+
+    .stat-cards {
+      display: grid; grid-template-columns: repeat(4,1fr);
+      gap: 0.75rem; margin-bottom: 1.25rem;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-top: 3px solid var(--border);
+      border-radius: 5px;
+      padding: 1.1rem 1.3rem 1rem;
+    }
+
+    .stat-lbl {
+      font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.07em;
+      color: var(--text-2); margin-bottom: 0.5rem;
+    }
+    .stat-val {
+      font-size: 1.4rem; font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      line-height: 1.2; letter-spacing: -0.02em;
+      color: #fff;
+    }
+    .stat-note { font-size: 11px; margin-top: 0.35rem; color: var(--text-2); }
+
+    /* DCA Chart */
+    .chart-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 1.25rem 1.5rem;
+    }
+
+    .chart-title {
+      font-size: 10px; font-weight: 800;
+      text-transform: uppercase; letter-spacing: 0.1em;
+      color: var(--text-2); margin-bottom: 0.85rem;
+    }
+
+    .chart-legend {
+      display: flex; gap: 1.5rem;
+      margin-bottom: 0.75rem;
+    }
+    .legend-item { display: flex; align-items: center; gap: 0.4rem; font-size: 11px; color: var(--text-2); }
+    .legend-dot  { width: 20px; height: 2px; border-radius: 1px; }
+
+    #dcaChart { width: 100%; display: block; }
+
+    /* ── Empty state ── */
+    .empty {
+      text-align: center; padding: 3rem 1rem;
+      color: var(--text-3); font-size: 13px;
+    }
+    .empty-icon { font-size: 2rem; margin-bottom: 0.5rem; opacity: 0.6; }
+
+    /* ── Utilities ── */
+    .mt1 { margin-top: 1rem; }
+    .mt15 { margin-top: 1.5rem; }
+    .flex { display: flex; }
+    .gap1 { gap: 1rem; }
+    .items-center { align-items: center; }
+    .justify-end { justify-content: flex-end; }
+
+    .tag {
+      display: inline-block; padding: 1px 7px;
+      border-radius: 3px; font-size: 10px; font-weight: 800;
+      letter-spacing: 0.05em; text-transform: uppercase;
+    }
+    .tag-green  { background: var(--green-dim);  color: var(--green); }
+    .tag-red    { background: var(--red-dim);    color: var(--red); }
+    .tag-yellow { background: var(--yellow-dim); color: var(--yellow); }
+    .tag-blue   { background: var(--accent-dim); color: var(--accent); }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<header>
+  <div class="hdr-left">
+    <div class="hdr-mark">◆</div>
+    <div class="hdr-title">เครื่องมือ<span>นักลงทุน</span></div>
+  </div>
+  <div class="hdr-date" id="hdrDate"></div>
+</header>
+
+<!-- Tabs -->
+<nav class="tabs">
+  <div class="tab-group">
+    <button class="tab active" onclick="switchTab('quiz', this)">แบบทดสอบความเสี่ยง</button>
+    <button class="tab" onclick="switchTab('analyzer', this)">วิเคราะห์หุ้น</button>
+    <button class="tab" onclick="switchTab('dca', this)">คำนวณ DCA</button>
+  </div>
+</nav>
+
+<main>
+
+<!-- ══════════════════════════════════════════════════════ QUIZ ══ -->
+<section id="quiz" class="section active">
+  <div class="sec-title">แบบทดสอบโปรไฟล์ความเสี่ยง</div>
+  <div class="sec-sub">ตอบคำถาม 5 ข้อเพื่อค้นหาระดับความเสี่ยงที่เหมาะสมกับท่าน</div>
+
+  <div id="quizQuestions"></div>
+
+  <div class="flex justify-end mt1">
+    <button class="btn btn-primary" onclick="calcRisk()">ดูผลการทดสอบ</button>
+  </div>
+
+  <div id="riskResult" class="panel risk-result"></div>
+</section>
+
+<!-- ══════════════════════════════════════════════════ ANALYZER ══ -->
+<section id="analyzer" class="section">
+  <div class="sec-title">วิเคราะห์หุ้น</div>
+  <div class="sec-sub">กรอกข้อมูลตัวเลขของหุ้นเพื่อรับการประเมินเบื้องต้น</div>
+
+  <div class="panel">
+    <div class="panel-title">เลือกตลาดและกรอกข้อมูล</div>
+
+    <div class="market-toggle" id="marketToggle">
+      <button class="market-btn active" onclick="setMarket('SET', this)">ตลาดหุ้นไทย (SET)</button>
+      <button class="market-btn" onclick="setMarket('US', this)">ตลาดหุ้นสหรัฐ (US)</button>
+    </div>
+
+    <div class="form-grid form-grid-2" style="margin-bottom:1rem">
+      <div class="field">
+        <label>ชื่อหุ้น / Ticker</label>
+        <input id="sName" type="text" placeholder="เช่น ADVANC, AAPL" />
+      </div>
+      <div class="field">
+        <label>ราคาหุ้น (บาท / USD)</label>
+        <input id="sPrice" type="number" placeholder="เช่น 235.00" step="0.01" min="0" />
+      </div>
+    </div>
+
+    <div class="form-grid form-grid-3" style="margin-bottom:1.25rem">
+      <div class="field">
+        <label>P/E Ratio</label>
+        <input id="sPE" type="number" placeholder="เช่น 15.5" step="0.01" min="0" />
+      </div>
+      <div class="field">
+        <label>P/BV Ratio</label>
+        <input id="sPBV" type="number" placeholder="เช่น 1.8" step="0.01" min="0" />
+      </div>
+      <div class="field">
+        <label>Dividend Yield (%)</label>
+        <input id="sDiv" type="number" placeholder="เช่น 3.5" step="0.01" min="0" />
+      </div>
+    </div>
+
+    <div class="flex justify-end">
+      <button class="btn btn-primary" onclick="analyzeStock()">วิเคราะห์หุ้น</button>
+    </div>
+  </div>
+
+  <div id="stockResult" style="display:none">
+    <div class="metric-cards" id="metricCards"></div>
+    <div class="panel" id="overallCard"></div>
+  </div>
+
+  <div id="stockEmpty" class="panel empty">
+    <div class="empty-icon">📊</div>
+    <div>กรอกข้อมูลด้านบนแล้วกด "วิเคราะห์หุ้น" เพื่อรับผลการประเมิน</div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════ DCA ══ -->
+<section id="dca" class="section">
+  <div class="sec-title">เครื่องคำนวณ DCA</div>
+  <div class="sec-sub">คำนวณผลตอบแทนจากการลงทุนแบบถัวเฉลี่ยต้นทุน (Dollar Cost Averaging)</div>
+
+  <!-- Stat cards — shown after calculate, full width above the layout -->
+  <div id="dcaSummary" style="display:none;margin-bottom:1.25rem">
+    <div class="stat-cards" id="dcaStatCards"></div>
+  </div>
+
+  <div class="dca-layout">
+    <!-- Inputs -->
+    <div class="panel" style="margin-bottom:0">
+      <div class="panel-title">กรอกข้อมูลการลงทุน</div>
+
+      <div class="form-grid" style="margin-bottom:1.25rem">
+        <div class="field">
+          <label>เงินลงทุนเริ่มต้น (บาท)</label>
+          <input id="dcaInit" type="number" placeholder="เช่น 100,000" min="0" />
+        </div>
+        <div class="field">
+          <label>ลงทุนเพิ่มรายเดือน (บาท)</label>
+          <input id="dcaMonthly" type="number" placeholder="เช่น 5,000" min="0" />
+        </div>
+        <div class="field">
+          <label>ระยะเวลาลงทุน (ปี)</label>
+          <input id="dcaYears" type="number" placeholder="เช่น 10" min="1" max="50" />
+        </div>
+        <div class="field">
+          <label>ผลตอบแทนที่คาดหวัง (%/ปี)</label>
+          <input id="dcaRate" type="number" placeholder="เช่น 8" min="0" max="100" step="0.1" />
+        </div>
+      </div>
+
+      <button class="btn btn-green" style="width:100%" onclick="calcDCA()">คำนวณผลตอบแทน</button>
+    </div>
+
+    <!-- Chart -->
+    <div>
+      <div class="chart-wrap">
+        <div class="chart-title">กราฟการเติบโตของพอร์ตโฟลิโอ</div>
+        <div class="chart-legend">
+          <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div>มูลค่าพอร์ต</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--border-hi);border-top:1px dashed var(--border-hi)"></div>เงินลงทุนสะสม</div>
+        </div>
+        <svg id="dcaChart" viewBox="0 0 560 260" preserveAspectRatio="xMidYMid meet">
+          <text x="280" y="130" text-anchor="middle" fill="#4a4338" font-size="13">กรอกข้อมูลและกด "คำนวณ" เพื่อดูกราฟ</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<script>
+  // ── Date ────────────────────────────────────────────────────────────────────
+  document.getElementById('hdrDate').textContent = new Date().toLocaleDateString('th-TH', {
+    year: 'numeric', month: 'long', day: 'numeric'
+  });
+
+  // ── Tab switching ────────────────────────────────────────────────────────────
+  function switchTab(id, btn) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  // ══════════════════════════════════════════════════════════════ QUIZ ════════
+  const questions = [
+    {
+      text: 'ท่านมีประสบการณ์การลงทุนในตลาดหุ้นมานานเท่าใด?',
+      opts: ['ไม่มีประสบการณ์เลย', 'น้อยกว่า 2 ปี', '2–5 ปี', 'มากกว่า 5 ปี']
+    },
+    {
+      text: 'หากพอร์ตของท่านลดลง 20% ใน 1 เดือน ท่านจะทำอย่างไร?',
+      opts: ['ขายทันทีเพื่อหยุดการขาดทุน', 'ขายบางส่วนและรอดูสถานการณ์', 'ถือต่อและรอให้ตลาดฟื้นตัว', 'ซื้อเพิ่มถือว่าเป็นโอกาส']
+    },
+    {
+      text: 'ท่านวางแผนจะใช้เงินลงทุนนี้เมื่อใด?',
+      opts: ['ภายใน 1 ปี', '1–3 ปี', '3–5 ปี', 'มากกว่า 5 ปี']
+    },
+    {
+      text: 'เป้าหมายหลักในการลงทุนของท่านคืออะไร?',
+      opts: ['รักษามูลค่าเงิน ไม่ต้องการเสี่ยง', 'รายได้สม่ำเสมอจากเงินปันผล', 'เติบโตของเงินในระยะกลาง', 'ผลตอบแทนสูงสุด ยอมรับความเสี่ยงได้มาก']
+    },
+    {
+      text: 'ท่านสามารถยอมรับการขาดทุนได้มากแค่ไหนโดยไม่กังวล?',
+      opts: ['ไม่ยอมรับการขาดทุนเลย', 'ขาดทุนได้ไม่เกิน 10%', 'ขาดทุนได้ 10–20%', 'ขาดทุนได้มากกว่า 20% หากมีโอกาสกำไรสูง']
+    }
+  ];
+
+  const profiles = [
+    {
+      range: [0, 5], color: '#10d4a0', bgColor: 'rgba(16,212,160,0.08)', borderColor: 'rgba(16,212,160,0.25)',
+      name: 'นักลงทุนแบบอนุรักษ์นิยม', nameEn: 'Conservative',
+      icon: '🛡️',
+      desc: 'ท่านให้ความสำคัญกับความปลอดภัยของเงินต้นมากกว่าผลตอบแทน เหมาะกับการลงทุนในพันธบัตร เงินฝากประจำ กองทุนตลาดเงิน หรือหุ้นที่มีเงินปันผลสม่ำเสมอ',
+      alloc: [
+        { name: 'พันธบัตร/เงินฝาก', pct: 60, color: '#10d4a0' },
+        { name: 'กองทุนรวม', pct: 25, color: '#3d85f0' },
+        { name: 'หุ้นปันผล', pct: 15, color: '#f59e0b' },
+      ]
+    },
+    {
+      range: [6, 10], color: '#3d85f0', bgColor: 'rgba(61,133,240,0.08)', borderColor: 'rgba(61,133,240,0.25)',
+      name: 'นักลงทุนแบบสมดุล', nameEn: 'Moderate',
+      icon: '⚖️',
+      desc: 'ท่านต้องการสมดุลระหว่างการเติบโตและการบริหารความเสี่ยง เหมาะกับกองทุนผสม หุ้น Blue Chip ขนาดใหญ่ และพันธบัตรในสัดส่วนที่พอดี',
+      alloc: [
+        { name: 'หุ้น', pct: 50, color: '#3d85f0' },
+        { name: 'พันธบัตร/ตราสารหนี้', pct: 35, color: '#10d4a0' },
+        { name: 'สินทรัพย์ทางเลือก', pct: 15, color: '#f59e0b' },
+      ]
+    },
+    {
+      range: [11, 15], color: '#f59e0b', bgColor: 'rgba(245,158,11,0.08)', borderColor: 'rgba(245,158,11,0.25)',
+      name: 'นักลงทุนแบบเชิงรุก', nameEn: 'Aggressive',
+      icon: '🚀',
+      desc: 'ท่านมุ่งเน้นการสร้างผลตอบแทนสูงสุดและยอมรับความผันผวนได้ดี เหมาะกับหุ้นเติบโต หุ้นเทคโนโลยี กองทุนต่างประเทศ และสินทรัพย์ทางเลือก',
+      alloc: [
+        { name: 'หุ้นเติบโต', pct: 70, color: '#f59e0b' },
+        { name: 'หุ้นต่างประเทศ', pct: 20, color: '#3d85f0' },
+        { name: 'สินทรัพย์ทางเลือก', pct: 10, color: '#10d4a0' },
+      ]
+    }
+  ];
+
+  // Build quiz HTML
+  (function buildQuiz() {
+    const wrap = document.getElementById('quizQuestions');
+    questions.forEach((q, qi) => {
+      const card = document.createElement('div');
+      card.className = 'q-card';
+      card.innerHTML = `
+        <div class="q-header">
+          <div class="q-num">${qi + 1}</div>
+          <div class="q-text">${q.text}</div>
+        </div>
+        <div class="options">
+          ${q.opts.map((o, oi) => `
+            <label class="opt">
+              <input type="radio" name="q${qi}" value="${oi}" />
+              ${o}
+            </label>`).join('')}
+        </div>`;
+      wrap.appendChild(card);
+    });
+
+    // Style selected radio labels
+    wrap.querySelectorAll('input[type=radio]').forEach(radio => {
+      radio.addEventListener('change', () => {
+        document.querySelectorAll(`[name="${radio.name}"]`).forEach(r => r.closest('.opt').classList.remove('selected'));
+        radio.closest('.opt').classList.add('selected');
+      });
+    });
+  })();
+
+  function calcRisk() {
+    let total = 0, answered = 0;
+    questions.forEach((_, i) => {
+      const sel = document.querySelector(`[name="q${i}"]:checked`);
+      if (sel) { total += parseInt(sel.value); answered++; }
+    });
+
+    if (answered < questions.length) {
+      alert('กรุณาตอบคำถามให้ครบทุกข้อ'); return;
+    }
+
+    const profile = profiles.find(p => total >= p.range[0] && total <= p.range[1]);
+    const maxScore = questions.length * 3;
+    const pct = Math.round((total / maxScore) * 100);
+
+    const res = document.getElementById('riskResult');
+    res.style.background = profile.bgColor;
+    res.style.border = `1px solid ${profile.borderColor}`;
+    res.innerHTML = `
+      <div class="risk-badge" style="background:${profile.bgColor};border:1px solid ${profile.borderColor};color:${profile.color}">
+        ${profile.icon} ${profile.nameEn}
+      </div>
+      <div class="risk-name" style="color:${profile.color}">${profile.name}</div>
+      <div class="risk-desc">${profile.desc}</div>
+
+      <div class="score-bar-wrap">
+        <div class="score-bar-label">
+          <span>อนุรักษ์นิยม</span><span>คะแนน ${total}/${maxScore}</span><span>เชิงรุก</span>
+        </div>
+        <div class="score-bar-track">
+          <div class="score-bar-fill" style="width:${pct}%;background:${profile.color}"></div>
+        </div>
+      </div>
+
+      <div class="alloc-title">สัดส่วนพอร์ตที่แนะนำ</div>
+      ${profile.alloc.map(a => `
+        <div class="alloc-row">
+          <div class="alloc-name">${a.name}</div>
+          <div class="alloc-track"><div class="alloc-fill" style="width:${a.pct}%;background:${a.color}"></div></div>
+          <div class="alloc-pct" style="color:${a.color}">${a.pct}%</div>
+        </div>`).join('')}`;
+    res.style.display = 'block';
+    res.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  // ════════════════════════════════════════════════════════ ANALYZER ══════════
+  let currentMarket = 'SET';
+
+  const benchmarks = {
+    SET: {
+      pe:  { low: 10, high: 18, avg: '15x', unit: 'เท่า' },
+      pbv: { low: 1,  high: 2,  avg: '1.5x', unit: 'เท่า' },
+      div: { low: 2,  high: 4,  avg: '3%', unit: '%', higherBetter: true }
+    },
+    US: {
+      pe:  { low: 15, high: 25, avg: '22x', unit: 'เท่า' },
+      pbv: { low: 2,  high: 4,  avg: '3x', unit: 'เท่า' },
+      div: { low: 1,  high: 3,  avg: '1.5%', unit: '%', higherBetter: true }
+    }
+  };
+
+  function setMarket(m, btn) {
+    currentMarket = m;
+    document.querySelectorAll('.market-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  function evalMetric(val, b, higherBetter) {
+    if (higherBetter) {
+      if (val >= b.high) return { label: 'ดีมาก', cls: 'tag-green', score: 2 };
+      if (val >= b.low)  return { label: 'ดี', cls: 'tag-yellow', score: 1 };
+      return { label: 'ต่ำ', cls: 'tag-red', score: 0 };
+    } else {
+      if (val < b.low)  return { label: 'ถูกมาก', cls: 'tag-green', score: 2 };
+      if (val <= b.high) return { label: 'เหมาะสม', cls: 'tag-yellow', score: 1 };
+      return { label: 'แพง', cls: 'tag-red', score: 0 };
+    }
+  }
+
+  function analyzeStock() {
+    const name  = document.getElementById('sName').value.trim() || 'N/A';
+    const pe    = parseFloat(document.getElementById('sPE').value);
+    const pbv   = parseFloat(document.getElementById('sPBV').value);
+    const div   = parseFloat(document.getElementById('sDiv').value);
+
+    if (isNaN(pe) || isNaN(pbv) || isNaN(div)) {
+      alert('กรุณากรอก P/E, P/BV และ Dividend Yield ให้ครบ'); return;
+    }
+
+    const b = benchmarks[currentMarket];
+    const ePE  = evalMetric(pe,  b.pe,  false);
+    const ePBV = evalMetric(pbv, b.pbv, false);
+    const eDiv = evalMetric(div, b.div, true);
+    const total = ePE.score + ePBV.score + eDiv.score;
+
+    let overall;
+    if (total >= 5)      overall = { icon: '✅', text: 'น่าลงทุน',  cls: 'tag-green',  bg: 'rgba(16,212,160,0.08)',  border: 'rgba(16,212,160,0.2)',  detail: `${name} มีตัวเลขพื้นฐานที่ดีในหลายมิติ อาจเป็นโอกาสลงทุนที่น่าสนใจ` };
+    else if (total >= 3) overall = { icon: '⚠️', text: 'เฝ้าระวัง', cls: 'tag-yellow', bg: 'rgba(245,158,11,0.08)', border: 'rgba(245,158,11,0.2)', detail: `${name} มีบางมิติที่น่าสนใจ แต่ควรศึกษาปัจจัยพื้นฐานเพิ่มเติมก่อนตัดสินใจ` };
+    else                 overall = { icon: '🔴', text: 'ระวัง',     cls: 'tag-red',    bg: 'rgba(240,96,96,0.08)',  border: 'rgba(240,96,96,0.2)',  detail: `ตัวเลขของ ${name} บ่งชี้ว่าราคาอาจสูงเกินมูลค่าพื้นฐาน ควรรอจังหวะที่เหมาะสมกว่านี้` };
+
+    document.getElementById('metricCards').innerHTML = `
+      <div class="metric-card">
+        <div class="metric-lbl">P/E Ratio</div>
+        <div class="metric-val">${pe.toFixed(1)}<span style="font-size:1rem;font-weight:500;color:var(--text-2)">x</span></div>
+        <span class="tag ${ePE.cls} metric-tag">${ePE.label}</span>
+        <div class="metric-bench">ค่าเฉลี่ย ${currentMarket}: ${b.pe.avg} | ต่ำกว่า ${b.pe.low}x = ถูก</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-lbl">P/BV Ratio</div>
+        <div class="metric-val">${pbv.toFixed(2)}<span style="font-size:1rem;font-weight:500;color:var(--text-2)">x</span></div>
+        <span class="tag ${ePBV.cls} metric-tag">${ePBV.label}</span>
+        <div class="metric-bench">ค่าเฉลี่ย ${currentMarket}: ${b.pbv.avg} | ต่ำกว่า ${b.pbv.low}x = ถูก</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-lbl">Dividend Yield</div>
+        <div class="metric-val">${div.toFixed(2)}<span style="font-size:1rem;font-weight:500;color:var(--text-2)">%</span></div>
+        <span class="tag ${eDiv.cls} metric-tag">${eDiv.label}</span>
+        <div class="metric-bench">ค่าเฉลี่ย ${currentMarket}: ${b.div.avg} | สูงกว่า ${b.div.high}% = ดีมาก</div>
+      </div>`;
+
+    document.getElementById('overallCard').innerHTML = `
+      <div class="overall-card" style="background:${overall.bg};border:1px solid ${overall.border};border-radius:8px;margin-bottom:1rem">
+        <div class="overall-icon">${overall.icon}</div>
+        <div>
+          <div class="overall-label">ผลการประเมิน — ${name} (${currentMarket})</div>
+          <div class="overall-text"><span class="tag ${overall.cls}">${overall.text}</span></div>
+          <div class="overall-detail">${overall.detail}</div>
+        </div>
+      </div>
+      <div class="disclaimer">⚠️ ข้อมูลนี้เพื่อการศึกษาเท่านั้น ไม่ใช่คำแนะนำการลงทุน การลงทุนมีความเสี่ยง ผู้ลงทุนควรศึกษาข้อมูลให้ครบถ้วนก่อนตัดสินใจ</div>`;
+
+    document.getElementById('stockResult').style.display = 'block';
+    document.getElementById('stockEmpty').style.display = 'none';
+  }
+
+  // ══════════════════════════════════════════════════════════════ DCA ═════════
+  function fmtTHB(n) {
+    if (n >= 1e6) return (n / 1e6).toFixed(2) + ' ล้าน';
+    return Math.round(n).toLocaleString('th-TH') + ' บาท';
+  }
+
+  function calcDCA() {
+    const init    = parseFloat(document.getElementById('dcaInit').value)    || 0;
+    const monthly = parseFloat(document.getElementById('dcaMonthly').value) || 0;
+    const years   = parseFloat(document.getElementById('dcaYears').value)   || 0;
+    const rate    = parseFloat(document.getElementById('dcaRate').value)    || 0;
+
+    if (years <= 0) { alert('กรุณากรอกระยะเวลาลงทุน'); return; }
+
+    const mr = rate / 100 / 12;
+    const months = Math.round(years * 12);
+
+    const fvInit    = init * Math.pow(1 + mr, months);
+    const fvMonthly = mr > 0
+      ? monthly * (Math.pow(1 + mr, months) - 1) / mr
+      : monthly * months;
+
+    const totalVal      = fvInit + fvMonthly;
+    const totalInvested = init + monthly * months;
+    const totalGain     = totalVal - totalInvested;
+    const roi           = totalInvested > 0 ? ((totalGain / totalInvested) * 100) : 0;
+
+    // Build yearly chart data
+    const data = [];
+    for (let y = 0; y <= years; y++) {
+      const m  = Math.round(y * 12);
+      const fI = init * Math.pow(1 + mr, m);
+      const fM = mr > 0 ? monthly * (Math.pow(1 + mr, m) - 1) / mr : monthly * m;
+      data.push({ year: y, value: fI + fM, invested: init + monthly * m });
+    }
+
+    // Stat cards (4 cards, full width)
+    document.getElementById('dcaStatCards').innerHTML = `
+      <div class="stat-card" style="border-top-color:#c8b89a">
+        <div class="stat-lbl">เงินลงทุนสะสม</div>
+        <div class="stat-val">${fmtTHB(totalInvested)}</div>
+        <div class="stat-note">รวม ${years} ปี</div>
+      </div>
+      <div class="stat-card" style="border-top-color:var(--accent)">
+        <div class="stat-lbl">มูลค่าพอร์ต</div>
+        <div class="stat-val" style="color:var(--accent)">${fmtTHB(totalVal)}</div>
+        <div class="stat-note">ณ สิ้นสุดระยะเวลา</div>
+      </div>
+      <div class="stat-card" style="border-top-color:var(--green)">
+        <div class="stat-lbl">กำไรสุทธิ</div>
+        <div class="stat-val" style="color:var(--green)">${fmtTHB(totalGain)}</div>
+        <div class="stat-note">จากดอกเบี้ยทบต้น</div>
+      </div>
+      <div class="stat-card" style="border-top-color:var(--green);background:rgba(106,200,126,0.07)">
+        <div class="stat-lbl">ผลตอบแทนรวม</div>
+        <div class="stat-val" style="color:var(--green);font-size:1.8rem">${roi >= 0 ? '+' : ''}${roi.toFixed(1)}%</div>
+        <div class="stat-note">บนเงินลงทุนสะสมทั้งหมด</div>
+      </div>`;
+    document.getElementById('dcaSummary').style.display = 'block';
+
+    drawDCAChart(data);
+  }
+
+  function drawDCAChart(data) {
+    const svg = document.getElementById('dcaChart');
+    svg.innerHTML = '';
+
+    const W=560, H=260, PL=72, PR=16, PT=16, PB=36;
+    const cW=W-PL-PR, cH=H-PT-PB;
+    const maxVal = Math.max(...data.map(d => d.value)) * 1.05;
+    const n = data.length;
+
+    const px = i => PL + (i/(n-1)) * cW;
+    const py = v => PT + (1 - v/maxVal) * cH;
+
+    const NS = 'http://www.w3.org/2000/svg';
+    const el = (tag, attrs) => {
+      const e = document.createElementNS(NS, tag);
+      Object.entries(attrs).forEach(([k,v]) => e.setAttribute(k,v));
+      return e;
+    };
+    const txt = (tag, attrs, text) => { const e=el(tag,attrs); e.textContent=text; return e; };
+
+    // Defs (gradients)
+    const defs = document.createElementNS(NS, 'defs');
+
+    const gVal = document.createElementNS(NS, 'linearGradient');
+    gVal.id='gVal'; gVal.setAttribute('x1','0'); gVal.setAttribute('y1','0'); gVal.setAttribute('x2','0'); gVal.setAttribute('y2','1');
+    const sv1=document.createElementNS(NS,'stop'); sv1.setAttribute('offset','0%'); sv1.setAttribute('stop-color','#c8963c'); sv1.setAttribute('stop-opacity','0.3');
+    const sv2=document.createElementNS(NS,'stop'); sv2.setAttribute('offset','100%'); sv2.setAttribute('stop-color','#c8963c'); sv2.setAttribute('stop-opacity','0.02');
+    gVal.append(sv1,sv2);
+
+    const gInv = document.createElementNS(NS, 'linearGradient');
+    gInv.id='gInv'; gInv.setAttribute('x1','0'); gInv.setAttribute('y1','0'); gInv.setAttribute('x2','0'); gInv.setAttribute('y2','1');
+    const si1=document.createElementNS(NS,'stop'); si1.setAttribute('offset','0%'); si1.setAttribute('stop-color','#3d3828'); si1.setAttribute('stop-opacity','0.7');
+    const si2=document.createElementNS(NS,'stop'); si2.setAttribute('offset','100%'); si2.setAttribute('stop-color','#3d3828'); si2.setAttribute('stop-opacity','0.05');
+    gInv.append(si1,si2);
+
+    defs.append(gVal, gInv);
+    svg.append(defs);
+
+    // Grid lines (5 horizontal)
+    for (let i=0; i<=4; i++) {
+      const v = maxVal * i / 4;
+      const y = py(v);
+      svg.append(
+        el('line', { x1:PL, x2:W-PR, y1:y, y2:y, stroke:'#2c2820', 'stroke-width':1 }),
+        txt('text', { x:PL-6, y:y+4, 'text-anchor':'end', fill:'#4a4338', 'font-size':10 },
+          v >= 1e6 ? (v/1e6).toFixed(1)+'M' : Math.round(v/1000)+'K')
+      );
+    }
+
+    // Area — invested
+    const invPts = data.map((d,i) => `${px(i)},${py(d.invested)}`).join(' ');
+    svg.append(el('polygon', { points:`${px(0)},${py(0)} ${invPts} ${px(n-1)},${py(0)}`, fill:'url(#gInv)' }));
+    const invD = data.map((d,i) => `${i?'L':'M'} ${px(i)} ${py(d.invested)}`).join(' ');
+    svg.append(el('path', { d:invD, fill:'none', stroke:'#3d3828', 'stroke-width':1.5, 'stroke-dasharray':'4,3' }));
+
+    // Area — value
+    const valPts = data.map((d,i) => `${px(i)},${py(d.value)}`).join(' ');
+    svg.append(el('polygon', { points:`${px(0)},${py(0)} ${valPts} ${px(n-1)},${py(0)}`, fill:'url(#gVal)' }));
+    const valD = data.map((d,i) => `${i?'L':'M'} ${px(i)} ${py(d.value)}`).join(' ');
+    svg.append(el('path', { d:valD, fill:'none', stroke:'#c8963c', 'stroke-width':2.5, 'stroke-linejoin':'round' }));
+
+    // X axis labels (every N years)
+    const step = Math.max(1, Math.floor(n / 8));
+    data.forEach((d,i) => {
+      if (i === 0 || i === n-1 || i % step === 0) {
+        svg.append(txt('text', { x:px(i), y:H-PB+15, 'text-anchor':'middle', fill:'#4a4338', 'font-size':10 }, `ปี ${d.year}`));
+      }
+    });
+
+    // Last point dot + value label
+    const last = data[data.length-1];
+    svg.append(
+      el('circle', { cx:px(n-1), cy:py(last.value), r:4, fill:'#171410', stroke:'#c8963c', 'stroke-width':2 }),
+      txt('text', { x:px(n-1)-4, y:py(last.value)-10, 'text-anchor':'end', fill:'#c8963c', 'font-size':10, 'font-weight':700 },
+        last.value >= 1e6 ? (last.value/1e6).toFixed(2)+'M' : Math.round(last.value/1000)+'K')
+    );
+  }
+</script>
+
+</body>
+</html>
